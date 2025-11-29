@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HeartDiseaseChecker")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d1c27f5040e35a1169a1b4ae363f0be6587be2e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2cd2b19094616b9da00280827fa8c90f58949d29")]
 [assembly: System.Reflection.AssemblyProductAttribute("HeartDiseaseChecker")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HeartDiseaseChecker")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

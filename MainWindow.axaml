@@ -2,40 +2,66 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="850"
         x:Class="HeartDiseaseChecker.MainWindow"
-        Title="HeartDiseaseChecker">
+        Title="HeartDiseaseChecker"
+        Width="600" Height="850">
     <StackPanel Margin="20" Spacing="10">
         <TextBlock Text="Heart Disease Risk Checker" FontSize="20" HorizontalAlignment="Center"/>
         
         <StackPanel>
             <TextBlock Text="Your Age:"/>
-            <NumericUpDown Name="AgeInput" Minimum="18" Maximum="100"/>
+            <NumericUpDown Name="AgeInput" Minimum="18" Maximum="100" Watermark="18+"/>
         </StackPanel>
 
         <StackPanel>
             <TextBlock Text="Gender:"/>
-            <TextBox Name="GenderInput"/>
+            <RadioButton Name="MaleInput" Content="Male"/>
+            <RadioButton Name="FemaleInput" Content="Female"/>
         </StackPanel>
+
 
         <StackPanel>
             <TextBlock Text="Blood Pressure:"/>
-            <TextBox Name="BloodPressureInput" Watermark="Example: 120"/>
+            <TextBox Name="BloodPressureInput" Watermark="mm/Hg"/>
         </StackPanel>
 
         <StackPanel>
             <TextBlock Text="Cholesterol:"/>
-            <TextBox Name="CholesterolInput"/>
+            <TextBox Name="CholesterolInput" Watermark="mg/dl"/>
+        </StackPanel>
+
+        <StackPanel>
+            <TextBlock Text="Is your Fasting Blood Sugar above 120 mg/dl?"/>
+            <RadioButton Name="FbsYesInput" Content="Yes"/>
+            <RadioButton Name="FbsNoInput" Content="No"/>
+        </StackPanel>
+
+
+        <StackPanel>
+            <TextBlock Text="Chest Pain Type:"/>
+            <RadioButton Name="Cp0Input" Content="Typical Angina (0)"/>
+            <RadioButton Name="Cp1Input" Content="Atypical Angina (1)"/>
+            <RadioButton Name="Cp2Input" Content="Non-Anginal Pain (2)"/>
+            <RadioButton Name="Cp3Input" Content="Asymptomatic (3)"/>    
+        </StackPanel>
+
+        <StackPanel>
+            <TextBlock Text="Do you experience chest pain during exercising?"/>
+            <RadioButton Name="ExangYesInput" Content="Yes"/>
+            <RadioButton Name="ExangNoInput" Content="No"/>
         </StackPanel>
 
         <Button Name="BtnCalculate" Content="Analyze Risk" HorizontalAlignment="Center" Click="BtnCalculate_Click"/>
-
 
         <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,20,0,0">
             <StackPanel>
                 <TextBlock Text="Results:" FontWeight="Bold" Margin="0,0,0,5"/>
                 <TextBlock Name="TextResult" 
-                           Text="Click after filling all fields to see the analysis." 
+                           Text='Click "Analyze Risk" after filling all fields to see the analysis.' 
+                           TextWrapping="Wrap"/>
+                <TextBlock Name="WarningText" 
+                           Text='' 
                            TextWrapping="Wrap"/>
             </StackPanel>
         </Border>
