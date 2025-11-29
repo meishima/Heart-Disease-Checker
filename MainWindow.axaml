@@ -5,5 +5,39 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="HeartDiseaseChecker.MainWindow"
         Title="HeartDiseaseChecker">
-    Welcome to Avalonia!
+    <StackPanel Margin="20" Spacing="10">
+        <TextBlock Text="Heart Disease Risk Checker" FontSize="20" HorizontalAlignment="Center"/>
+        
+        <StackPanel>
+            <TextBlock Text="Your Age:"/>
+            <NumericUpDown Name="AgeInput" Minimum="18" Maximum="100"/>
+        </StackPanel>
+
+        <StackPanel>
+            <TextBlock Text="Gender:"/>
+            <TextBox Name="GenderInput"/>
+        </StackPanel>
+
+        <StackPanel>
+            <TextBlock Text="Blood Pressure:"/>
+            <TextBox Name="BloodPressureInput" Watermark="Example: 120"/>
+        </StackPanel>
+
+        <StackPanel>
+            <TextBlock Text="Cholesterol:"/>
+            <TextBox Name="CholesterolInput"/>
+        </StackPanel>
+
+        <Button Name="BtnCalculate" Content="Analyze Risk" HorizontalAlignment="Center" Click="BtnCalculate_Click"/>
+
+
+        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,20,0,0">
+            <StackPanel>
+                <TextBlock Text="Results:" FontWeight="Bold" Margin="0,0,0,5"/>
+                <TextBlock Name="TextResult" 
+                           Text="Click after filling all fields to see the analysis." 
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
 </Window>
