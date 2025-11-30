@@ -1,0 +1,7 @@
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/heartdiseasecheckerLinux/HeartDiseaseChecker.pdb
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/heartdiseasecheckerLinux/libHarfBuzzSharp.so
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/heartdiseasecheckerLinux/libLdaNative.so
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/heartdiseasecheckerLinux/libLdaNative.so.dbg
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/heartdiseasecheckerLinux/libSkiaSharp.so
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/heartdiseasecheckerLinux/libe_sqlite3.so
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/heartdiseasecheckerLinux/HeartDiseaseChecker
