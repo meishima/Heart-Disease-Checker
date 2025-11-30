@@ -64,6 +64,10 @@
               "target": "Package",
               "version": "[11.3.9, )"
             },
+            "Microsoft.Data.Sqlite": {
+              "target": "Package",
+              "version": "[10.0.0, )"
+            },
             "Microsoft.ML": {
               "target": "Package",
               "version": "[5.0.0, )"

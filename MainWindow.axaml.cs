@@ -1,19 +1,26 @@
+using System.Security.Cryptography.X509Certificates;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Microsoft.ML;
+using System;
 
 namespace HeartDiseaseChecker;
 
 public partial class MainWindow : Window
 {
+    // Temporary variables for "SaveBtn_Click" function
+    private HeartData? _tempData;
+    private HeartPrediction? _tempPrediction;
     public MainWindow()
     {
         InitializeComponent();
+        SaveBtn.IsEnabled = false;
     }
-
     public void BtnCalculate_Click(object sender, RoutedEventArgs e)
     {
+        SaveText.Children.Clear();
+        
         if(AgeInput.Value == null)
         {
             TextResult.Text = "Please enter a valid age.";
@@ -43,6 +50,7 @@ public partial class MainWindow : Window
             TextResult.Foreground = Brushes.OrangeRed;
             return;
         }
+        SaveBtn.IsEnabled = true;
 
         MLContext mLContext = new MLContext();
         DataViewSchema modelSchema;
@@ -62,6 +70,9 @@ public partial class MainWindow : Window
         };
 
         var result = predEngine.Predict(input);
+
+        _tempData = input;
+        _tempPrediction = result;
 
         if(result.Prediction)
         {
@@ -133,5 +144,45 @@ public partial class MainWindow : Window
         TextResult.Foreground = Brushes.White;
         RiskBar.Value = 0;
         AdvicePanel.Children.Clear();
+        SaveBtn.IsEnabled = false;
+        _tempData = null;
+        _tempPrediction = null;
+        SaveText.Children.Clear();
+    }
+
+    private void SaveBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if(_tempData == null || _tempPrediction == null)
+        {
+            return;
+        }
+        DatabaseManager.InsertRecord(
+            DateTime.Now,
+            _tempData.Age,
+            _tempData.Gender == 0 ? "Male" : "Female",
+            _tempData.BloodPressure,
+            _tempData.Cholesterol,
+            _tempData.BloodSugar == 0 ? "Yes" : "No",
+            _tempData.ChestPainType switch
+            {
+                0 => "Typical Angina",
+                1 => "Atypical Angina",
+                2 => "Non-Anginal Pain",
+                3 => "Asymptomatic",
+                _ => "Unknown"
+            },
+            _tempData.ExerciseInducedAngina == 0 ? "Yes" : "No",
+            _tempPrediction!.Probability
+        );
+
+        SaveText.Children.Add(
+            new TextBlock
+            {
+                Text = "Result has saved to the database.",
+                Foreground = Brushes.LightGreen,
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap
+            }
+        );
+        SaveBtn.IsEnabled = false;
     }
 }

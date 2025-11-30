@@ -11,7 +11,7 @@ class Program
     [STAThread]
     public static void Main(string[] args) { 
         //DataTraining.Train();
-
+        DatabaseManager.InitializeDatabase();
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 
