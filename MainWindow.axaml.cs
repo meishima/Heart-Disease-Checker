@@ -29,13 +29,13 @@ public partial class MainWindow : Window
             return;
         }
 
-        int genderVal = MaleInput.IsChecked == true ? 1 : FemaleInput.IsChecked == true ? 0 : -1;
-        int fbsVal = FbsYesInput.IsChecked == true ? 1 : FbsNoInput.IsChecked == true ? 0 : -1;
+        int genderVal = MaleInput.IsChecked == true ? 0 : FemaleInput.IsChecked == true ? 1 : -1;
+        int fbsVal = FbsYesInput.IsChecked == true ? 0 : FbsNoInput.IsChecked == true ? 1 : -1;
         int cpVal = Cp0Input.IsChecked == true ? 0 : 
                     Cp1Input.IsChecked == true ? 1 :
                     Cp2Input.IsChecked == true ? 2 : 
                     Cp3Input.IsChecked == true ? 3 : -1;
-        int exangVal = ExangYesInput.IsChecked == true ? 1 : ExangNoInput.IsChecked == true ? 0 : -1;
+        int exangVal = ExangYesInput.IsChecked == true ? 0 : ExangNoInput.IsChecked == true ? 1 : -1;
 
         if(genderVal == -1 || fbsVal == -1 || cpVal == -1 || exangVal == -1)
         {
@@ -73,5 +73,65 @@ public partial class MainWindow : Window
             TextResult.Text = $"Low risk of heart disease! (Probability: {result.Probability * 100:F1}%)";
             TextResult.Foreground = Brushes.Green;
         }
+
+        AdvicePanel.Children.Clear();
+        if(bpValue >= 180)
+        {
+            AddAdvice("You are in Hypertensive Crisis! Seek emergency help immediately!", Brushes.DarkRed);
+        } 
+        else if(bpValue >= 140)
+        {
+            AddAdvice("You are in High Blood Pressure Stage 2! Consult a doctor immediately.", Brushes.Red);
+        } 
+        else if(bpValue >= 130)
+        {
+            AddAdvice("You are in High Blood Pressure Stage 1!", Brushes.OrangeRed);
+        } 
+        else if(bpValue >= 120)
+        {
+            AddAdvice("Your blood pressure is elevated.", Brushes.Yellow);
+        }   
+
+        if(cholValue >= 240)
+        {
+            AddAdvice("Your cholesterol level is high! Consult a doctor immediately.", Brushes.Red);
+        }
+        else if(cholValue >= 200)
+        {
+            AddAdvice("Your cholesterol level is borderline-high! Consult a doctor.", Brushes.OrangeRed);
+        }
+        RiskBar.Value = result.Probability * 100;
+    }
+    private void AddAdvice(string message, IBrush color)
+    {
+        var textBlock = new TextBlock
+        {
+            Text = message,
+            Foreground = color,
+            TextWrapping = Avalonia.Media.TextWrapping.Wrap
+        };
+
+        AdvicePanel.Children.Add(textBlock);    
+    }
+
+    private void BtnReset_Click(object sender, RoutedEventArgs e)
+    {
+        AgeInput.Value = null;
+        MaleInput.IsChecked = false;
+        FemaleInput.IsChecked = false;
+        BloodPressureInput.Text = "";
+        CholesterolInput.Text = "";
+        FbsYesInput.IsChecked = false;
+        FbsNoInput.IsChecked = false;
+        Cp0Input.IsChecked = false;
+        Cp1Input.IsChecked = false;
+        Cp2Input.IsChecked = false;
+        Cp3Input.IsChecked = false;
+        ExangYesInput.IsChecked = false;
+        ExangNoInput.IsChecked = false;
+        TextResult.Text = "Click \"Analyze Risk\" after filling all fields to see the analysis";
+        TextResult.Foreground = Brushes.White;
+        RiskBar.Value = 0;
+        AdvicePanel.Children.Clear();
     }
 }

@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="850"
         x:Class="HeartDiseaseChecker.MainWindow"
         Title="HeartDiseaseChecker"
-        Width="600" Height="850">
+        Width="600" Height="900">
     <StackPanel Margin="20" Spacing="10">
         <TextBlock Text="Heart Disease Risk Checker" FontSize="20" HorizontalAlignment="Center"/>
         
@@ -52,17 +52,22 @@
             <RadioButton Name="ExangNoInput" Content="No"/>
         </StackPanel>
 
-        <Button Name="BtnCalculate" Content="Analyze Risk" HorizontalAlignment="Center" Click="BtnCalculate_Click"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+            <Button Name="BtnCalculate" Content="Analyze Risk" Click="BtnCalculate_Click"/>
+            <Button Name="BtnReset" Content="Reset" Click="BtnReset_Click"/>
+        </StackPanel>
 
-        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,20,0,0">
+        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,10,0,0">
             <StackPanel>
                 <TextBlock Text="Results:" FontWeight="Bold" Margin="0,0,0,5"/>
                 <TextBlock Name="TextResult" 
                            Text='Click "Analyze Risk" after filling all fields to see the analysis.' 
                            TextWrapping="Wrap"/>
+                <ProgressBar Name="RiskBar" Minimum="0" Maximum="100" Height="20" ShowProgressText="True" Margin="0,10,0,0"/>
                 <TextBlock Name="WarningText" 
                            Text='' 
                            TextWrapping="Wrap"/>
+                <StackPanel Name="AdvicePanel" Spacing="5"/>
             </StackPanel>
         </Border>
     </StackPanel>
