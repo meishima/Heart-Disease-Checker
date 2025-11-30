@@ -55,6 +55,7 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
             <Button Name="BtnCalculate" Content="Analyze Risk" Click="BtnCalculate_Click"/>
             <Button Name="SaveBtn" Content="Save Result" Click="SaveBtn_Click"/>
+            <Button Name="BtnHistory" Content="View History" Click="BtnHistory_Click"/>
             <Button Name="BtnReset" Content="Reset" Click="BtnReset_Click"/>
         </StackPanel>
 
@@ -67,7 +68,7 @@
                            Text='Click "Analyze Risk" after filling all fields to see the analysis.' 
                            TextWrapping="Wrap"/>
                 <ProgressBar Name="RiskBar" Minimum="0" Maximum="100" Height="20" ShowProgressText="True" Margin="0,10,0,0"/>
-                <StackPanel Name="AdvicePanel" Spacing="5"/>
+                <StackPanel Name="AdvicePanel" Spacing="5" Margin="5"/>
             </StackPanel>
         </Border>
     </StackPanel>

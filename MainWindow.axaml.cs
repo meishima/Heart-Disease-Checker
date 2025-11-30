@@ -20,7 +20,7 @@ public partial class MainWindow : Window
     public void BtnCalculate_Click(object sender, RoutedEventArgs e)
     {
         SaveText.Children.Clear();
-        
+
         if(AgeInput.Value == null)
         {
             TextResult.Text = "Please enter a valid age.";
@@ -119,7 +119,7 @@ public partial class MainWindow : Window
         {
             Text = message,
             Foreground = color,
-            TextWrapping = Avalonia.Media.TextWrapping.Wrap
+            TextWrapping = Avalonia.Media.TextWrapping.Wrap,
         };
 
         AdvicePanel.Children.Add(textBlock);    
@@ -184,5 +184,11 @@ public partial class MainWindow : Window
             }
         );
         SaveBtn.IsEnabled = false;
+    }
+
+    private void BtnHistory_Click(object sender, RoutedEventArgs e)
+    {
+        var historyWindow = new HistoryWindow();
+        historyWindow.ShowDialog(this);
     }
 }

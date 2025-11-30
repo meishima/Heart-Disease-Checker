@@ -24,5 +24,8 @@ build_property.EnableCodeStyleSeverity =
 [/home/meishima/dev/gorselprog/HeartDiseaseChecker/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[/home/meishima/dev/gorselprog/HeartDiseaseChecker/HistoryWindow.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [/home/meishima/dev/gorselprog/HeartDiseaseChecker/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

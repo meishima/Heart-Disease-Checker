@@ -61,5 +61,68 @@ namespace HeartDiseaseChecker
                 command.ExecuteNonQuery();
             }
         }
+
+        public static System.Collections.Generic.List<PatientRecord> GetRecords()
+        {
+            var list = new System.Collections.Generic.List<PatientRecord>();
+            using (var connection = new SqliteConnection($"Data Source={DbName}"))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                SELECT Id, Date, Age, Gender, BloodPressure, Cholesterol, BloodSugar, ChestPainType, ExerciseInducedAngina, Probability FROM PatientRecords;
+                ";
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new PatientRecord
+                        {
+                            Id = reader.GetInt32(0),
+                            Date = DateTime.Parse(reader.GetString(1)),
+                            Age = reader.GetFloat(2),
+                            Gender = reader.GetString(3),
+                            BloodPressure = reader.GetFloat(4),
+                            Cholesterol = reader.GetFloat(5),
+                            BloodSugar = reader.GetString(6),
+                            ChestPainType = reader.GetString(7),
+                            ExerciseInducedAngina = reader.GetString(8),
+                            Probability = reader.GetFloat(9)
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
+        public static void DeleteRecord(int id)
+        {
+            using (var connection = new SqliteConnection($"Data Source={DbName}"))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                DELETE FROM PatientRecords WHERE Id = $id;
+                ";
+                command.Parameters.AddWithValue("$id", id);
+                command.ExecuteNonQuery();
+            }
+        }
+    }
+
+    public class PatientRecord
+    {
+        public int Id { get; set; }
+        public DateTime Date { get; set; }
+        public float Age { get; set; }
+        public string? Gender { get; set; }
+        public float BloodPressure { get; set; }
+        public float Cholesterol { get; set; }
+        public string? BloodSugar { get; set; }
+        public string? ChestPainType { get; set; }
+        public string? ExerciseInducedAngina { get; set; }
+        public float Probability { get; set; }
     }
 }
