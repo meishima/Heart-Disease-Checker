@@ -1,0 +1,7 @@
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/windowsexe/HeartDiseaseChecker.pdb
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/windowsexe/av_libglesv2.dll
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/windowsexe/libHarfBuzzSharp.dll
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/windowsexe/LdaNative.dll
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/windowsexe/libSkiaSharp.dll
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/windowsexe/e_sqlite3.dll
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/windowsexe/HeartDiseaseChecker.exe

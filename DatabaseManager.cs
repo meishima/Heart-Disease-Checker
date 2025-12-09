@@ -96,7 +96,7 @@ namespace HeartDiseaseChecker
             return list;
         }
 
-        public static void DeleteRecord(int id)
+        public static void DeleteAllRecords()
         {
             using (var connection = new SqliteConnection($"Data Source={DbName}"))
             {
@@ -104,9 +104,8 @@ namespace HeartDiseaseChecker
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                DELETE FROM PatientRecords WHERE Id = $id;
+                DELETE FROM PatientRecords;
                 ";
-                command.Parameters.AddWithValue("$id", id);
                 command.ExecuteNonQuery();
             }
         }
