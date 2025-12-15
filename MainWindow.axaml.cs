@@ -88,32 +88,32 @@ public partial class MainWindow : Window
         AdvicePanel.Children.Clear();
         if(bpValue >= 180)
         {
-            AddAdvice("You are in Hypertensive Crisis! Seek emergency help immediately!", Brushes.DarkRed);
+            AddText("You are in Hypertensive Crisis! Seek emergency help immediately!", Brushes.DarkRed, AdvicePanel);
         } 
         else if(bpValue >= 140)
         {
-            AddAdvice("You are in High Blood Pressure Stage 2! Consult a doctor immediately.", Brushes.Red);
+            AddText("You are in High Blood Pressure Stage 2! Consult a doctor immediately.", Brushes.Red, AdvicePanel);
         } 
         else if(bpValue >= 130)
         {
-            AddAdvice("You are in High Blood Pressure Stage 1!", Brushes.OrangeRed);
+            AddText("You are in High Blood Pressure Stage 1!", Brushes.OrangeRed, AdvicePanel);
         } 
         else if(bpValue >= 120)
         {
-            AddAdvice("Your blood pressure is elevated.", Brushes.Yellow);
+            AddText("Your blood pressure is elevated.", Brushes.Yellow, AdvicePanel);
         }   
 
         if(cholValue >= 240)
         {
-            AddAdvice("Your cholesterol level is high! Consult a doctor immediately.", Brushes.Red);
+            AddText("Your cholesterol level is high! Consult a doctor immediately.", Brushes.Red, AdvicePanel);
         }
         else if(cholValue >= 200)
         {
-            AddAdvice("Your cholesterol level is borderline-high! Consult a doctor.", Brushes.OrangeRed);
+            AddText("Your cholesterol level is borderline-high! Consult a doctor.", Brushes.OrangeRed, AdvicePanel);
         }
         RiskBar.Value = result.Probability * 100;
     }
-    private void AddAdvice(string message, IBrush color)
+    private void AddText(string message, IBrush color, StackPanel panel)
     {
         var textBlock = new TextBlock
         {
@@ -122,7 +122,7 @@ public partial class MainWindow : Window
             TextWrapping = Avalonia.Media.TextWrapping.Wrap,
         };
 
-        AdvicePanel.Children.Add(textBlock);    
+        panel.Children.Add(textBlock);    
     }
 
     private void BtnReset_Click(object sender, RoutedEventArgs e)
@@ -190,5 +190,11 @@ public partial class MainWindow : Window
     {
         var historyWindow = new HistoryWindow();
         historyWindow.ShowDialog(this);
+    }
+
+    private void BtnDataset_Click(object sender, RoutedEventArgs e)
+    {
+        var datasetWindow = new DatasetWindow();
+        datasetWindow.ShowDialog(this);
     }
 }
