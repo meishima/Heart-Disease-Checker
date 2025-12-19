@@ -6,8 +6,9 @@
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="800"
         x:Class="HeartDiseaseChecker.DatasetWindow"
         Title="DatasetWindow"
-        Width="600" Height="800">
-        <Grid RowDefinitions="Auto, Auto, *" Margin="10">
+    Width="1200" Height="900">
+    <ScrollViewer>
+        <Grid RowDefinitions="Auto, Auto, Auto" Margin="10">
             <TextBlock Grid.Row="0" Text="Dataset Calculations" FontSize="20" HorizontalAlignment="Center" Margin="0,0,0,10"/>                     
             <DataGrid Grid.Row="1"
                 Name="ModelGrid" 
@@ -23,7 +24,7 @@
                     <DataGridTextColumn Header="Accuracy" Binding="{Binding Accuracy}" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <Grid Grid.Row="2" RowDefinitions="*,*" ColumnDefinitions="*,*" Margin="10" ShowGridLines="False">
+            <Grid Grid.Row="2" RowDefinitions="400,400,400,400,500" ColumnDefinitions="*,*" Margin="10" ShowGridLines="False">
                 
                 <Border Grid.Row="0" Grid.Column="0" Background="White" CornerRadius="15" Margin="0,0,10,10" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
                     <ScottPlot:AvaPlot Name="CholChart"/>
@@ -33,14 +34,35 @@
                     <ScottPlot:AvaPlot Name="BPChart"/>
                 </Border>
 
-                <Border Grid.Row="1" Grid.Column="0" Background="White" CornerRadius="15" Margin="0,10,10,0" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
+                <Border Grid.Row="1" Grid.Column="0" Background="White" CornerRadius="15" Margin="0,10,10,10" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
                     <ScottPlot:AvaPlot Name="HRChart"/>
                 </Border>
 
-                <Border Grid.Row="1" Grid.Column="1" Background="White" CornerRadius="15" Margin="10,10,0,0" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
+                <Border Grid.Row="1" Grid.Column="1" Background="White" CornerRadius="15" Margin="10,10,0,10" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
                     <ScottPlot:AvaPlot Name="ExangChart"/>
+                </Border>
+
+                <Border Grid.Row="2" Grid.Column="0" Background="White" CornerRadius="15" Margin="0,10,10,10" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
+                    <ScottPlot:AvaPlot Name="ThalachBoxPlot"/>
+                </Border>
+
+                <Border Grid.Row="2" Grid.Column="1" Background="White" CornerRadius="15" Margin="10,10,0,10" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
+                    <ScottPlot:AvaPlot Name="AgeBoxPlot"/>
+                </Border>
+
+                <Border Grid.Row="3" Grid.Column="0" Background="White" CornerRadius="15" Margin="0,10,10,10" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
+                    <ScottPlot:AvaPlot Name="CPSeverityChart"/>
+                </Border>
+
+                <Border Grid.Row="3" Grid.Column="1" Background="White" CornerRadius="15" Margin="10,10,0,10" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
+                    <ScottPlot:AvaPlot Name="SexRiskChart"/>
+                </Border>
+
+                <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Background="White" CornerRadius="15" Margin="0,10,0,0" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
+                    <ScottPlot:AvaPlot Name="CorrelationChart"/>
                 </Border>
 
             </Grid>
         </Grid>
+    </ScrollViewer>
 </Window>

@@ -197,4 +197,38 @@ public partial class MainWindow : Window
         var datasetWindow = new DatasetWindow();
         datasetWindow.ShowDialog(this);
     }
+
+    private void BtnVisualize_Click(object sender, RoutedEventArgs e)
+    {
+        if (AgeInput.Value == null || MaxHRInput.Value == null)
+        {
+            TextResult.Text = "Please enter Age and Max Heart Rate to visualize risk.";
+            TextResult.Foreground = Brushes.OrangeRed;
+            return;
+        }
+
+        int genderVal = MaleInput.IsChecked == true ? 1 : FemaleInput.IsChecked == true ? 0 : -1;
+        int cpVal = Cp0Input.IsChecked == true ? 0 :
+                    Cp1Input.IsChecked == true ? 1 :
+                    Cp2Input.IsChecked == true ? 2 :
+                    Cp3Input.IsChecked == true ? 3 : -1;
+
+        if (genderVal == -1 || cpVal == -1)
+        {
+            TextResult.Text = "Please select Gender and Chest Pain Type.";
+            TextResult.Foreground = Brushes.OrangeRed;
+            return;
+        }
+
+        var metrics = new UserMetrics
+        {
+            Age = (double)AgeInput.Value,
+            MaxHR = (double)MaxHRInput.Value,
+            Sex = genderVal,
+            CP = cpVal
+        };
+
+        var datasetWindow = new DatasetWindow(metrics);
+        datasetWindow.ShowDialog(this);
+    }
 }

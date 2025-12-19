@@ -6,71 +6,79 @@
         x:Class="HeartDiseaseChecker.MainWindow"
         Title="HeartDiseaseChecker"
         Width="650" Height="850">
-    <StackPanel Margin="20" Spacing="10">
-        <TextBlock Text="Heart Disease Risk Checker" FontSize="20" HorizontalAlignment="Center"/>
-        
-        <StackPanel>
-            <TextBlock Text="Your Age:"/>
-            <NumericUpDown Name="AgeInput" Minimum="18" Maximum="100" Watermark="18+"/>
-        </StackPanel>
-
-        <StackPanel>
-            <TextBlock Text="Gender:"/>
-            <RadioButton Name="MaleInput" Content="Male"/>
-            <RadioButton Name="FemaleInput" Content="Female"/>
-        </StackPanel>
-
-
-        <StackPanel>
-            <TextBlock Text="Blood Pressure:"/>
-            <TextBox Name="BloodPressureInput" Watermark="mm/Hg"/>
-        </StackPanel>
-
-        <StackPanel>
-            <TextBlock Text="Cholesterol:"/>
-            <TextBox Name="CholesterolInput" Watermark="mg/dl"/>
-        </StackPanel>
-
-        <StackPanel>
-            <TextBlock Text="Is your Fasting Blood Sugar above 120 mg/dl?"/>
-            <RadioButton Name="FbsYesInput" Content="Yes"/>
-            <RadioButton Name="FbsNoInput" Content="No"/>
-        </StackPanel>
-
-
-        <StackPanel>
-            <TextBlock Text="Chest Pain Type:"/>
-            <RadioButton Name="Cp0Input" Content="Typical Angina (0)"/>
-            <RadioButton Name="Cp1Input" Content="Atypical Angina (1)"/>
-            <RadioButton Name="Cp2Input" Content="Non-Anginal Pain (2)"/>
-            <RadioButton Name="Cp3Input" Content="Asymptomatic (3)"/>    
-        </StackPanel>
-
-        <StackPanel>
-            <TextBlock Text="Do you experience chest pain during exercising?"/>
-            <RadioButton Name="ExangYesInput" Content="Yes"/>
-            <RadioButton Name="ExangNoInput" Content="No"/>
-        </StackPanel>
-
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
-            <Button Name="BtnCalculate" Content="Analyze Risk" Click="BtnCalculate_Click"/>
-            <Button Name="SaveBtn" Content="Save Result" Click="SaveBtn_Click"/>
-            <Button Name="BtnHistory" Content="View History" Click="BtnHistory_Click"/>
-            <Button Name="BtnReset" Content="Reset" Click="BtnReset_Click"/>
-            <Button Name="BtnDataset" Content="Dataset Calculations" Click="BtnDataset_Click"/>
-        </StackPanel>
-
-        <StackPanel Name="SaveText"/>
-
-        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,10,0,0">
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="10">
+            <TextBlock Text="Heart Disease Risk Checker" FontSize="20" HorizontalAlignment="Center"/>
+            
             <StackPanel>
-                <TextBlock Text="Results:" FontWeight="Bold" Margin="0,0,0,5"/>
-                <TextBlock Name="TextResult" 
-                           Text='Click "Analyze Risk" after filling all fields to see the analysis.' 
-                           TextWrapping="Wrap"/>
-                <ProgressBar Name="RiskBar" Minimum="0" Maximum="100" Height="20" ShowProgressText="True" Margin="0,10,0,0"/>
-                <StackPanel Name="AdvicePanel" Spacing="5" Margin="5"/>
+                <TextBlock Text="Your Age:"/>
+                <NumericUpDown Name="AgeInput" Minimum="18" Maximum="100" Watermark="18+"/>
             </StackPanel>
-        </Border>
-    </StackPanel>
+    
+            <StackPanel>
+                <TextBlock Text="Gender:"/>
+                <RadioButton Name="MaleInput" Content="Male"/>
+                <RadioButton Name="FemaleInput" Content="Female"/>
+            </StackPanel>
+    
+    
+            <StackPanel>
+                <TextBlock Text="Blood Pressure:"/>
+                <TextBox Name="BloodPressureInput" Watermark="mm/Hg"/>
+            </StackPanel>
+    
+            <StackPanel>
+                <TextBlock Text="Cholesterol:"/>
+                <TextBox Name="CholesterolInput" Watermark="mg/dl"/>
+            </StackPanel>
+    
+            <StackPanel>
+                <TextBlock Text="Is your Fasting Blood Sugar above 120 mg/dl?"/>
+                <RadioButton Name="FbsYesInput" Content="Yes"/>
+                <RadioButton Name="FbsNoInput" Content="No"/>
+            </StackPanel>
+    
+    
+            <StackPanel>
+                <TextBlock Text="Chest Pain Type:"/>
+                <RadioButton Name="Cp0Input" Content="Typical Angina (0)"/>
+                <RadioButton Name="Cp1Input" Content="Atypical Angina (1)"/>
+                <RadioButton Name="Cp2Input" Content="Non-Anginal Pain (2)"/>
+                <RadioButton Name="Cp3Input" Content="Asymptomatic (3)"/>    
+            </StackPanel>
+    
+            <StackPanel>
+                <TextBlock Text="Do you experience chest pain during exercising?"/>
+                <RadioButton Name="ExangYesInput" Content="Yes"/>
+                <RadioButton Name="ExangNoInput" Content="No"/>
+            </StackPanel>
+    
+            <StackPanel>
+                <TextBlock Text="Max Heart Rate:"/>
+                <NumericUpDown Name="MaxHRInput" Minimum="50" Maximum="220" Watermark="e.g. 150"/>
+            </StackPanel>
+    
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                <Button Name="BtnCalculate" Content="Analyze Risk" Click="BtnCalculate_Click"/>
+                <Button Name="BtnVisualize" Content="Visualize My Risk" Click="BtnVisualize_Click"/>
+                <Button Name="SaveBtn" Content="Save Result" Click="SaveBtn_Click"/>
+                <Button Name="BtnHistory" Content="View History" Click="BtnHistory_Click"/>
+                <Button Name="BtnReset" Content="Reset" Click="BtnReset_Click"/>
+                <Button Name="BtnDataset" Content="Dataset Calculations" Click="BtnDataset_Click"/>
+            </StackPanel>
+    
+            <StackPanel Name="SaveText"/>
+    
+            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,10,0,0">
+                <StackPanel>
+                    <TextBlock Text="Results:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBlock Name="TextResult" 
+                               Text='Click "Analyze Risk" after filling all fields to see the analysis.' 
+                               TextWrapping="Wrap"/>
+                    <ProgressBar Name="RiskBar" Minimum="0" Maximum="100" Height="20" ShowProgressText="True" Margin="0,10,0,0"/>
+                    <StackPanel Name="AdvicePanel" Spacing="5" Margin="5"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </Window>
