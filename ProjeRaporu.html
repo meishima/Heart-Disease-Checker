@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Disease Checker - Proje Raporu</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        h3 { color: #16a085; margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f2f2f2; color: #2c3e50; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .mermaid { text-align: center; margin: 20px 0; }
+        @media print {
+            body { max-width: 100%; padding: 0; }
+            button { display: none; }
+            a { text-decoration: none; color: #333; }
+        }
+        .print-btn {
+            background-color: #3498db; color: white; border: none; padding: 10px 20px; 
+            border-radius: 5px; cursor: pointer; float: right; font-size: 14px;
+        }
+        .print-btn:hover { background-color: #2980b9; }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">🖨️ PDF Olarak İndir / Yazdır</button>
+    
+    <h1>Heart Disease Checker - Proje Raporu</h1>
+
+    <h2>1. Proje Özeti</h2>
+    <p>Bu proje, Kalp Hastalığı veri setini kullanarak makine öğrenimi modelleri eğiten, kıyaslayan ve bu modelleri klinik bir karar destek sistemi olarak kullanan bir masaüstü uygulamasıdır. <code>ML.NET</code> ve <code>Avalonia UI</code> teknolojileri kullanılarak geliştirilmiştir.</p>
+    <p>Uygulamanın temel amacı, farklı sınıflandırma algoritmalarının başarısını ölçmek ve kullanıcılara kendi sağlık verileri üzerinden risk analizi yapma imkanı sunmaktır.</p>
+
+    <hr>
+
+    <h2>2. İş Akışı (Workflow)</h2>
+    <div class="mermaid">
+    graph TD
+        A["Veri Kaynağı (CSV)"] -->|"Yükleme"| B("Veri Ön İşleme");
+        B -->|"Seçenekler: MinMax, Z-Score"| C["Eğitim Seti / Test Seti (%80-%20)"];
+        C --> D{"Algoritma Seçimi"};
+        D -->|"Logistic Regression"| E1["Eğitim"];
+        D -->|"Random Forest"| E2["Eğitim"];
+        D -->|"SVM"| E3["Eğitim"];
+        D -->|"XGBoost"| E4["Eğitim"];
+        D -->|"Neural Network"| E5["Eğitim"];
+        E1 & E2 & E3 & E4 & E5 --> F["Model Değerlendirme"];
+        F -->|"Doğruluk, F1, ROC"| G["Sonuç Dashboard'u"];
+        G --> H["Model Havuzu (Bellek)"];
+        
+        User["Kullanıcı Verisi"] --> I["Tahmin Arayüzü"];
+        H -->|"Tüm Modeller"| I;
+        I --> J["Konsensüs Raporu"];
+    </div>
+
+    <hr>
+
+    <h2>3. Veri Profili</h2>
+    <p>Kullanılan veri seti (Cleveland Heart Disease), kalp hastalığı teşhisi için kritik 13 özellikten (biz 7 tanesini kullanıyoruz) oluşur.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Sütun Adı</th>
+                <th>Açıklama</th>
+                <th>Tip</th>
+                <th>Örnek</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>Age</strong></td><td>Hastanın yaşı</td><td>Sayısal</td><td>63</td></tr>
+            <tr><td><strong>Gender</strong></td><td>Cinsiyet (1: Erkek, 0: Kadın)</td><td>Kategorik</td><td>1</td></tr>
+            <tr><td><strong>CP</strong></td><td>Göğüs Ağrısı Tipi (0-3)</td><td>Kategorik</td><td>0 (Tipik Anjina)</td></tr>
+            <tr><td><strong>Trestbps</strong></td><td>İstirahat Kan Basıncı</td><td>Sayısal</td><td>145 mm/Hg</td></tr>
+            <tr><td><strong>Chol</strong></td><td>Serum Kolesterol</td><td>Sayısal</td><td>233 mg/dl</td></tr>
+            <tr><td><strong>Fbs</strong></td><td>Açlık Kan Şekeri > 120 (1: Evet, 0: Hayır)</td><td>Kategorik</td><td>1</td></tr>
+            <tr><td><strong>Restecg</strong></td><td>İstirahat EKG Sonucu</td><td>Kategorik</td><td>0</td></tr>
+            <tr><td><strong>Thalach</strong></td><td>Maksimum Kalp Atış Hızı</td><td>Sayısal</td><td>150</td></tr>
+            <tr><td><strong>Exang</strong></td><td>Egzersizle İndüklenen Anjina (1: Evet)</td><td>Kategorik</td><td>0</td></tr>
+            <tr><td><strong>Oldpeak</strong></td><td>ST Depresyonu</td><td>Sayısal</td><td>2.3</td></tr>
+            <tr><td><strong>Slope</strong></td><td>ST Segment Eğimi</td><td>Kategorik</td><td>0</td></tr>
+            <tr><td><strong>Ca</strong></td><td>Renklendirilen Büyük Damar Sayısı</td><td>Sayısal</td><td>0</td></tr>
+            <tr><td><strong>Thal</strong></td><td>Talasemi</td><td>Kategorik</td><td>1</td></tr>
+            <tr><td><strong>Target</strong></td><td>Kalp Hastalığı Riski (0: Yok, 1: Var)</td><td>Hedef</td><td>1</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>4. Kullanılan Algoritmalar</h2>
+
+    <h3>A. Lojistik Regresyon (Logistic Regression)</h3>
+    <ul>
+        <li><strong>Mantık:</strong> Verilerin bir sınıfa ait olma olasılığını <code>Sigmoid</code> fonksiyonu kullanarak hesaplar. Doğrusal bir karar sınırı çizer.</li>
+        <li><strong>Avantajı:</strong> Hızlıdır, yorumlanabilirliği yüksektir.</li>
+        <li><strong>Kullanım:</strong> Temel referans (baseline) modeli olarak kullanılır.</li>
+    </ul>
+
+    <h3>B. Rastgele Orman (Random Forest)</h3>
+    <ul>
+        <li><strong>Mantık:</strong> Birden fazla Karar Ağacı (Decision Tree) eğitir ve bu ağaçların "oy çokluğu" ile karar verir (Ensemble Learning).</li>
+        <li><strong>Avantajı:</strong> Overfitting'e (aşırı öğrenme) karşı dirençlidir, karmaşık ilişkileri yakalar.</li>
+        <li><strong>Kullanım:</strong> Genellikle en yüksek doğruluğu veren modeldir.</li>
+    </ul>
+
+    <h3>C. Destek Vektör Makineleri (SVM)</h3>
+    <ul>
+        <li><strong>Mantık:</strong> Veri noktalarını sınıflara ayırmak için en uygun "hiper-düzlemi" (hyperplane) bulur.</li>
+        <li><strong>Avantajı:</strong> Yüksek boyutlu verilerde etkilidir.</li>
+        <li><strong>Kullanım:</strong> Marjinal vakaları ayırt etmede iyidir.</li>
+    </ul>
+
+    <h3>D. Yükseltilmiş Karar Ağaçları (XGBoost / FastTree)</h3>
+    <ul>
+        <li><strong>Mantık:</strong> Hatalı tahmin yapan ağaçların hatalarını düzeltmek üzere sıralı (boosting) ağaçlar kurar.</li>
+        <li><strong>Avantajı:</strong> Yarışmalarda sıkça kullanılan, performansı çok yüksek bir yöntemdir.</li>
+    </ul>
+
+    <hr>
+
+    <h2>5. Sağlanan Özellikler ve Fazlar</h2>
+    <p>Proje aşağıdaki sırayla geliştirilmiştir:</p>
+    <ol>
+        <li><strong>Mimari Refactoring:</strong> Kod tabanı <code>Models</code> ve <code>Services</code> olarak modüler hale getirildi.</li>
+        <li><strong>Ön İşleme (Preprocessing):</strong> Kullanıcıya Min-Max ve Z-Score normalizasyon seçenekleri sunuldu.</li>
+        <li><strong>Algoritma Seçimi:</strong> Kullanıcı hangi modellerin eğitileceğini seçebilir hale geldi.</li>
+        <li><strong>Görselleştirme:</strong>
+            <ul>
+                <li>Confusion Matrix (Isı Haritası)</li>
+                <li>ROC Eğrileri</li>
+                <li>Kutu grafikleri (Box Plots)</li>
+            </ul>
+        </li>
+        <li><strong>Çoklu Karar Destek Sistemi:</strong> Tek bir model yerine, eğitilmiş tüm modellerin ortak kararı (Ensemble Inference) kullanılarak güven skoru hesaplandı.</li>
+    </ol>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>

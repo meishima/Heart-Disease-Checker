@@ -1,0 +1,37 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DatasetWindow.axaml.cs(43,35): error CS0103: The name 'RangeBase' does not exist in the current context [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DatasetWindow.axaml.cs(54,9): warning CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(139,74): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(171,33): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(180,27): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(181,30): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(182,37): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(183,37): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(184,35): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(185,34): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(186,45): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(187,29): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DatasetWindow.axaml.cs(331,25): warning CS8601: Possible null reference assignment. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DatasetWindow.axaml.cs(340,25): warning CS8601: Possible null reference assignment. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+
+Build FAILED.
+
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DatasetWindow.axaml.cs(54,9): warning CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(139,74): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(171,33): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(180,27): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(181,30): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(182,37): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(183,37): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(184,35): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(185,34): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(186,45): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DataCalculation.cs(187,29): warning CS8629: Nullable value type may be null. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DatasetWindow.axaml.cs(331,25): warning CS8601: Possible null reference assignment. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DatasetWindow.axaml.cs(340,25): warning CS8601: Possible null reference assignment. [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+/home/meishima/dev/gorselprog/HeartDiseaseChecker/DatasetWindow.axaml.cs(43,35): error CS0103: The name 'RangeBase' does not exist in the current context [/home/meishima/dev/gorselprog/HeartDiseaseChecker/HeartDiseaseChecker.csproj]
+    13 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.95

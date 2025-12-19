@@ -9,7 +9,30 @@
     Width="1200" Height="900">
     <ScrollViewer>
         <Grid RowDefinitions="Auto, Auto, Auto" Margin="10">
-            <TextBlock Grid.Row="0" Text="Dataset Calculations" FontSize="20" HorizontalAlignment="Center" Margin="0,0,0,10"/>                     
+            <StackPanel Grid.Row="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                    <TextBlock Text="Veriseti Hesaplamaları" FontSize="20" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                    <ComboBox Name="ScalingCombo" SelectedIndex="0" Width="200" SelectionChanged="ScalingCombo_SelectionChanged">
+                        <ComboBoxItem>İşlem Yok</ComboBoxItem>
+                        <ComboBoxItem>Min-Max Normalizasyonu</ComboBoxItem>
+                        <ComboBoxItem>Z-Score Standardizasyonu</ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+
+                <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,0,0,10" HorizontalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Eğitilecek Algoritmalar" FontWeight="Bold" Margin="0,0,0,5" HorizontalAlignment="Center"/>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <CheckBox Name="chkLR" Content="Lojistik Regresyon" IsChecked="True" Margin="0,0,10,0"/>
+                            <CheckBox Name="chkRF" Content="Rastgele Orman" IsChecked="True" Margin="0,0,10,0"/>
+                            <CheckBox Name="chkXGB" Content="XGBoost" IsChecked="True" Margin="0,0,10,0"/>
+                            <CheckBox Name="chkSVM" Content="SVM" IsChecked="True" Margin="0,0,10,0"/>
+                            <CheckBox Name="chkNN" Content="Yapay Sinir Ağı" IsChecked="True" Margin="0,0,20,0"/>
+                            <Button Name="btnTrain" Content="Modelleri Eğit" Click="TrainButton_Click" Background="#3498DB" Foreground="White" Padding="15,5" CornerRadius="5" VerticalAlignment="Center"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
             <DataGrid Grid.Row="1"
                 Name="ModelGrid" 
                 x:CompileBindings="False" 
@@ -18,13 +41,17 @@
                 GridLinesVisibility="All"
                 BorderThickness="1" 
                 BorderBrush="Gray">
-                              
+                                
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Algorithm" Binding="{Binding Name}" Width="*"/>
-                    <DataGridTextColumn Header="Accuracy" Binding="{Binding Accuracy}" Width="*"/>
+                    <DataGridTextColumn Header="Algoritma" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Doğruluk" Binding="{Binding Accuracy}" Width="*"/>
+                    <DataGridTextColumn Header="Hassasiyet (Pre)" Binding="{Binding Precision, StringFormat=\{0:F2\}}" Width="*"/>
+                    <DataGridTextColumn Header="Duyarlılık (Rec)" Binding="{Binding Recall, StringFormat=\{0:F2\}}" Width="*"/>
+                    <DataGridTextColumn Header="F1 Skoru" Binding="{Binding F1Score, StringFormat=\{0:F2\}}" Width="*"/>
+                    <DataGridTextColumn Header="AUC" Binding="{Binding AUC, StringFormat=\{0:F2\}}" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <Grid Grid.Row="2" RowDefinitions="400,400,400,400,500" ColumnDefinitions="*,*" Margin="10" ShowGridLines="False">
+            <Grid Grid.Row="2" RowDefinitions="400,400,400,400,500,500" ColumnDefinitions="*,*" Margin="10" ShowGridLines="False">
                 
                 <Border Grid.Row="0" Grid.Column="0" Background="White" CornerRadius="15" Margin="0,0,10,10" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
                     <ScottPlot:AvaPlot Name="CholChart"/>
@@ -58,9 +85,18 @@
                     <ScottPlot:AvaPlot Name="SexRiskChart"/>
                 </Border>
 
-                <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Background="White" CornerRadius="15" Margin="0,10,0,0" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
+                <Border Grid.Row="4" Grid.Column="0" Background="White" CornerRadius="15" Margin="0,10,10,0" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
                     <ScottPlot:AvaPlot Name="CorrelationChart"/>
                 </Border>
+
+                <Border Grid.Row="4" Grid.Column="1" Background="White" CornerRadius="15" Margin="0,10,0,0" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
+                    <ScottPlot:AvaPlot Name="ConfusionMatrixChart"/>
+                </Border>
+
+                <Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Background="White" CornerRadius="15" Margin="0,10,10,0" Padding="10" BoxShadow="0 2 5 0 #E0E0E0">
+                    <ScottPlot:AvaPlot Name="ROCChart"/>
+                </Border>
+
 
             </Grid>
         </Grid>

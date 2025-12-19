@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-
 using Avalonia.Layout;
 using Avalonia.Media;
 using ScottPlot;
@@ -10,6 +9,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
+using HeartDiseaseChecker.Models;
+using HeartDiseaseChecker.Services;
 
 namespace HeartDiseaseChecker;
 
@@ -28,7 +30,8 @@ public partial class DatasetWindow : Window
     public DatasetWindow()
     {
         InitializeComponent();
-        LoadDataAndCharts();
+        // Load data structure but don't train any models yet (faster startup)
+        LoadDataAndCharts(selection: (AlgorithmType)0);
         DrawDashboard();
     }
 
@@ -38,15 +41,72 @@ public partial class DatasetWindow : Window
         DrawDashboard(); // Redraw with metrics
     }
 
-    private async void LoadDataAndCharts()
+    private async void LoadDataAndCharts(PreprocessingType preprocessing = PreprocessingType.None, AlgorithmType selection = AlgorithmType.All)
     {
-        ModelGrid.ItemsSource = new List<ModelResult> { new ModelResult { Name = "Training.. Please Wait.", Accuracy = "..." } };
+        if (ModelGrid == null) return;
+
+        ModelGrid.ItemsSource = new List<ModelResult> { new ModelResult { Name = "Eğitiliyor.. Lütfen Bekleyin.", Accuracy = "..." } };
+
         var results = await Task.Run(() =>
         {
             if (!File.Exists("heart.csv")) return new List<ModelResult>();
-            return ModelComparison.RunAllModels("heart.csv");
+            return ModelService.RunAllModels("heart.csv", preprocessing, selection);
         });
+
         ModelGrid.ItemsSource = results;
+        if (results.Any())
+        {
+            var bestModel = results.First();
+            DrawConfusionMatrix(ConfusionMatrixChart, bestModel.ConfusionMatrix, bestModel.Name);
+            DrawROC(ROCChart, results);
+        }
+        else
+        {
+            // Clear charts if no results
+            ConfusionMatrixChart.Plot.Clear(); ConfusionMatrixChart.Refresh();
+            ROCChart.Plot.Clear(); ROCChart.Refresh();
+        }
+    }
+
+    private AlgorithmType GetSelectedAlgorithms()
+    {
+        AlgorithmType selection = 0;
+        if (chkLR?.IsChecked == true) selection |= AlgorithmType.LogisticRegression;
+        if (chkRF?.IsChecked == true) selection |= AlgorithmType.RandomForest;
+        if (chkXGB?.IsChecked == true) selection |= AlgorithmType.XGBoost;
+        if (chkSVM?.IsChecked == true) selection |= AlgorithmType.SVM;
+        if (chkNN?.IsChecked == true) selection |= AlgorithmType.NeuralNetwork;
+        return selection;
+    }
+
+    private void TrainButton_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var algs = GetSelectedAlgorithms();
+        if (algs == 0)
+        {
+            // Show message maybe? For now just return.
+            return;
+        }
+
+        if (ScalingCombo.SelectedIndex >= 0)
+        {
+            var type = (PreprocessingType)ScalingCombo.SelectedIndex;
+            LoadDataAndCharts(type, algs);
+        }
+    }
+
+    private void ScalingCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        // Avoid running before UI is fully initialized
+        if (ModelGrid == null) return;
+
+        if (sender is ComboBox combo && combo.SelectedIndex >= 0)
+        {
+            var type = (PreprocessingType)combo.SelectedIndex;
+            // Use currently selected algorithms
+            var algs = GetSelectedAlgorithms();
+            if (algs != 0) LoadDataAndCharts(type, algs);
+        }
     }
 
     private void DrawDashboard()
@@ -60,13 +120,13 @@ public partial class DatasetWindow : Window
         var exH = new List<double>(); var exS = new List<double>();
         var ageH = new List<double>(); var ageS = new List<double>();
         var cpH = new List<double>(); var cpS = new List<double>();
-        var sexH = new List<double>(); var sexS = new List<double>(); // Added CP lists
+        var sexH = new List<double>(); var sexS = new List<double>();
 
         var allAges = new List<double>();
         var allBps = new List<double>();
         var allChols = new List<double>();
         var allMaxHRs = new List<double>();
-        var allCPs = new List<double>(); // Added allCPs list
+        var allCPs = new List<double>();
 
         foreach (var line in lines)
         {
@@ -79,7 +139,7 @@ public partial class DatasetWindow : Window
             double.TryParse(p[4], out double chol);
             double.TryParse(p[7], out double hr);
             double.TryParse(p[8], out double exang);
-            double.TryParse(p[2], out double cp); // Extract CP from index 2
+            double.TryParse(p[2], out double cp);
             double.TryParse(p[0], out double age);
             double.TryParse(p[1], out double sex);
 
@@ -87,7 +147,7 @@ public partial class DatasetWindow : Window
             allBps.Add(bp);
             allChols.Add(chol);
             allMaxHRs.Add(hr);
-            allCPs.Add(cp); // Populate allCPs
+            allCPs.Add(cp);
 
             if (target == 1)
             {
@@ -97,7 +157,7 @@ public partial class DatasetWindow : Window
                 exH.Add(exang);
                 ageH.Add(age);
                 cpH.Add(cp);
-                sexH.Add(sex); // Populate cpH
+                sexH.Add(sex);
             }
             else
             {
@@ -107,34 +167,29 @@ public partial class DatasetWindow : Window
                 exS.Add(exang);
                 ageS.Add(age);
                 cpS.Add(cp);
-                sexS.Add(sex); // Populate cpS
+                sexS.Add(sex);
             }
         }
 
-        DrawSingleBarChart(CholChart, "Average Cholesterol", cholH.Average(), cholS.Average(), "mg/dl");
-        DrawSingleBarChart(BPChart, "Average Blood Pressure", bpH.Average(), bpS.Average(), "mm Hg");
-        DrawSingleBarChart(HRChart, "Maximum Heart Rate", hrH.Average(), hrS.Average(), "bpm");
+        DrawSingleBarChart(CholChart, "Ortalama Kolesterol", cholH.Average(), cholS.Average(), "mg/dl");
+        DrawSingleBarChart(BPChart, "Ortalama Kan Basıncı", bpH.Average(), bpS.Average(), "mm Hg");
+        DrawSingleBarChart(HRChart, "Maksimum Kalp Atış Hızı", hrH.Average(), hrS.Average(), "bpm");
         double exH_Percent = (exH.Count(x => x > 0) / (double)exH.Count) * 100;
         double exS_Percent = (exS.Count(x => x > 0) / (double)exS.Count) * 100;
-        DrawSingleBarChart(ExangChart, "Exang Percentage", exH_Percent, exS_Percent, "%");
-        // Drawn in CPSeverityChart instead
+        DrawSingleBarChart(ExangChart, "Egzersiz Anjinası Yüzdesi", exH_Percent, exS_Percent, "%");
 
-        // New Distribution Charts
-        DrawBoxPlot(ThalachBoxPlot, "Max Heart Rate Distribution", hrH, hrS, "Max Heart Rate", _userMetrics?.MaxHR);
-        DrawBoxPlot(AgeBoxPlot, "Age Distribution", ageH, ageS, "Age", _userMetrics?.Age);
+        DrawBoxPlot(ThalachBoxPlot, "Maksimum Kalp Atış Hızı Dağılımı", hrH, hrS, "Maksimum Kalp Atış Hızı", _userMetrics?.MaxHR);
+        DrawBoxPlot(AgeBoxPlot, "Yaş Dağılımı", ageH, ageS, "Yaş", _userMetrics?.Age);
 
         int? userCPIndex = _userMetrics?.CP;
-        DrawGroupedBarChart(CPSeverityChart, "Chest Pain Risk Analysis", cpH, cpS,
-            new[] { "Typical", "Atypical", "Non-Anginal", "Asymptomatic" }, userCPIndex);
+        DrawGroupedBarChart(CPSeverityChart, "Göğüs Ağrısı Risk Analizi", cpH, cpS,
+            new[] { "Tipik", "Atipik", "Anjinal Olmayan", "Asemptomatik" }, userCPIndex);
 
         int? userSexIndex = _userMetrics?.Sex;
-        DrawGroupedBarChart(SexRiskChart, "Sex Risk Analysis", sexH, sexS,
-            new[] { "Male", "Female" }, userSexIndex); // Note: Dataset has 0=Female, 1=Male usually, but distinct sort might change order. 
-                                                       // Let's verify distinct order: Female(0) then Male(1).
-                                                       // But Wait, distinct.OrderBy(x=>x) means 0 then 1. 0 is Female usually in heart datasets. 
-                                                       // If userSexIndex match 0 or 1 it will work.
+        DrawGroupedBarChart(SexRiskChart, "Cinsiyet Risk Analizi", sexH, sexS,
+            new[] { "Erkek", "Kadın" }, userSexIndex);
 
-        DrawCorrelationMatrix(CorrelationChart, allAges, allBps, allChols, allMaxHRs, allCPs); // Updated call
+        DrawCorrelationMatrix(CorrelationChart, allAges, allBps, allChols, allMaxHRs, allCPs);
     }
 
     private void DrawSingleBarChart(ScottPlot.Avalonia.AvaPlot chart, string title, double valHealthy, double valSick, string yLabel)
@@ -171,8 +226,8 @@ public partial class DatasetWindow : Window
         chart.Plot.YLabel(yLabel);
 
         ScottPlot.TickGenerators.NumericManual tickGen = new();
-        tickGen.AddMajor(1, "Healthy");
-        tickGen.AddMajor(2, "In Risk");
+        tickGen.AddMajor(1, "Sağlıklı");
+        tickGen.AddMajor(2, "Riskli");
         chart.Plot.Axes.Bottom.TickGenerator = tickGen;
         chart.Plot.Axes.Bottom.TickLabelStyle.FontSize = 12;
         chart.Plot.Axes.Bottom.TickLabelStyle.Bold = true;
@@ -186,78 +241,6 @@ public partial class DatasetWindow : Window
 
         chart.UserInputProcessor.Disable();
         chart.Refresh();
-    }
-
-    private void DrawScatterPlot(ScottPlot.Avalonia.AvaPlot chart, string title,
-        List<double> xH, List<double> yH,
-        List<double> xS, List<double> yS,
-        string xLabel, string yLabel)
-    {
-        chart.Plot.Clear();
-
-        var colorHealthy = ScottPlot.Color.FromHex("#48C9B0");
-        var colorSick = ScottPlot.Color.FromHex("#EC7063");
-
-        // Scatter Points with opacity
-        var scatterH = chart.Plot.Add.Scatter(xH.ToArray(), yH.ToArray());
-        scatterH.Color = colorHealthy.WithAlpha(0.6);
-        scatterH.LegendText = "Healthy";
-        scatterH.MarkerStyle.Size = 6;
-        scatterH.LineWidth = 0;
-
-        var scatterS = chart.Plot.Add.Scatter(xS.ToArray(), yS.ToArray());
-        scatterS.Color = colorSick.WithAlpha(0.6);
-        scatterS.LegendText = "In Risk";
-        scatterS.MarkerStyle.Size = 6;
-        scatterS.LineWidth = 0;
-
-        // Trend Lines
-        if (xH.Count > 1)
-        {
-            var (slopeH, interceptH) = GetLinearRegression(xH, yH);
-            var lineH = chart.Plot.Add.Line(xH.Min(), xH.Min() * slopeH + interceptH, xH.Max(), xH.Max() * slopeH + interceptH);
-            lineH.Color = colorHealthy;
-            lineH.LineWidth = 3;
-            lineH.LinePattern = ScottPlot.LinePattern.Solid;
-        }
-
-        if (xS.Count > 1)
-        {
-            var (slopeS, interceptS) = GetLinearRegression(xS, yS);
-            var lineS = chart.Plot.Add.Line(xS.Min(), xS.Min() * slopeS + interceptS, xS.Max(), xS.Max() * slopeS + interceptS);
-            lineS.Color = colorSick;
-            lineS.LineWidth = 3;
-            lineS.LinePattern = ScottPlot.LinePattern.Solid;
-        }
-
-        chart.Plot.Title(title);
-        chart.Plot.XLabel(xLabel);
-        chart.Plot.YLabel(yLabel);
-
-        // Improve        
-        chart.Plot.ShowLegend();
-        chart.Plot.Axes.Title.Label.FontSize = 16;
-        chart.Plot.Axes.Title.Label.Bold = true;
-
-        // chart.Plot.HideGrid(); // Removed to enable grid
-        chart.UserInputProcessor.Disable();
-        chart.Refresh();
-    }
-
-    private (double Slope, double Intercept) GetLinearRegression(List<double> x, List<double> y)
-    {
-        double n = x.Count;
-        double sumX = x.Sum();
-        double sumY = y.Sum();
-        double sumXY = x.Zip(y, (a, b) => a * b).Sum();
-        double sumX2 = x.Select(a => a * a).Sum();
-
-        double denominator = n * sumX2 - sumX * sumX;
-        if (Math.Abs(denominator) < 1e-9) return (0, y.Average());
-
-        double slope = (n * sumXY - sumX * sumY) / denominator;
-        double intercept = (sumY - slope * sumX) / n;
-        return (slope, intercept);
     }
 
     private void DrawBoxPlot(ScottPlot.Avalonia.AvaPlot chart, string title,
@@ -286,7 +269,7 @@ public partial class DatasetWindow : Window
             marker.Color = ScottPlot.Colors.Gold;
             marker.Size = 15;
             marker.Shape = ScottPlot.MarkerShape.FilledDiamond;
-            marker.LegendText = "You";
+            marker.LegendText = "Siz";
             chart.Plot.ShowLegend();
         }
 
@@ -294,8 +277,8 @@ public partial class DatasetWindow : Window
         chart.Plot.YLabel(yLabel);
 
         ScottPlot.TickGenerators.NumericManual tickGen = new();
-        tickGen.AddMajor(1, "Healthy");
-        tickGen.AddMajor(2, "In Risk");
+        tickGen.AddMajor(1, "Sağlıklı");
+        tickGen.AddMajor(2, "Riskli");
         chart.Plot.Axes.Bottom.TickGenerator = tickGen;
 
         chart.UserInputProcessor.Disable();
@@ -312,13 +295,6 @@ public partial class DatasetWindow : Window
         double median = values[values.Count / 2];
         double q1 = values[values.Count / 4];
         double q3 = values[values.Count * 3 / 4];
-
-        // ScottPlot.Box struct usually takes these order
-        // Box(double min, double max, double q1, double median, double q3) - Check signature or use properties
-        // Assuming ScottPlot.Box is a struct/class with properties.
-
-        // Safety: In ScottPlot 5, Box is often a struct.
-        // Logic: range (min to max), box (q1 to q3), line (median)
 
         return new ScottPlot.Box
         {
@@ -351,7 +327,7 @@ public partial class DatasetWindow : Window
                 Position = i * 3,
                 Value = countH,
                 FillColor = ScottPlot.Color.FromHex("#48C9B0"),
-                Label = i == 0 ? "Healthy" : null
+                Label = i == 0 ? "Sağlıklı" : null
             };
 
             // Red bar (Risk)
@@ -360,10 +336,9 @@ public partial class DatasetWindow : Window
                 Position = i * 3 + 1,
                 Value = countS,
                 FillColor = ScottPlot.Color.FromHex("#EC7063"),
-                Label = i == 0 ? "In Risk" : null
+                Label = i == 0 ? "Riskli" : null
             };
 
-            // Highlight if matches user category (assuming index match val)
             if (userCategory.HasValue && (int)val == userCategory.Value)
             {
                 barH.LineWidth = 3;
@@ -394,7 +369,7 @@ public partial class DatasetWindow : Window
     }
 
     private void DrawCorrelationMatrix(ScottPlot.Avalonia.AvaPlot chart,
-        List<double> ages, List<double> bps, List<double> chols, List<double> hrs, List<double> cps) // Updated signature
+        List<double> ages, List<double> bps, List<double> chols, List<double> hrs, List<double> cps)
     {
         chart.Plot.Clear();
 
@@ -403,10 +378,10 @@ public partial class DatasetWindow : Window
             bps.ToArray(),
             chols.ToArray(),
             hrs.ToArray(),
-            cps.ToArray() // Updated data array
+            cps.ToArray()
         };
 
-        string[] labels = { "Age", "Trestbps", "Chol", "Thalach", "CP" }; // Updated labels
+        string[] labels = { "Yaş", "Tansiyon", "Kol", "Nabız", "GA" };
         int count = labels.Length;
         double[,] matrix = new double[count, count];
 
@@ -420,7 +395,6 @@ public partial class DatasetWindow : Window
 
         var hm = chart.Plot.Add.Heatmap(matrix);
 
-        // Add text labels for correlation values on top of heatmap cells
         for (int i = 0; i < count; i++)
         {
             for (int j = 0; j < count; j++)
@@ -433,7 +407,6 @@ public partial class DatasetWindow : Window
             }
         }
 
-        // Set up axes
         chart.Plot.Axes.Bottom.TickGenerator = new ScottPlot.TickGenerators.NumericManual();
         chart.Plot.Axes.Left.TickGenerator = new ScottPlot.TickGenerators.NumericManual();
 
@@ -446,15 +419,13 @@ public partial class DatasetWindow : Window
             leftTick.AddMajor(i, labels[i]);
         }
 
-        // Invert Y axis so (0,0) is top-left like a matrix
         chart.Plot.Axes.SetLimits(-0.5, count - 0.5, -0.5, count - 0.5);
         chart.Plot.Axes.Left.TickLabelStyle.FontSize = 14;
         chart.Plot.Axes.Bottom.TickLabelStyle.FontSize = 14;
 
-        // Add ColorBar
         chart.Plot.Add.ColorBar(hm);
 
-        chart.Plot.Title("Correlation Matrix");
+        chart.Plot.Title("Korelasyon Matrisi");
         chart.Plot.Axes.Title.Label.FontSize = 18;
 
         chart.UserInputProcessor.Disable();
@@ -478,4 +449,98 @@ public partial class DatasetWindow : Window
         if (denominator == 0) return 0;
         return numerator / denominator;
     }
+
+    private void DrawConfusionMatrix(ScottPlot.Avalonia.AvaPlot chart, double[][] matrixData, string modelName)
+    {
+        chart.Plot.Clear();
+
+        double[,] matrix = new double[2, 2];
+
+        // Safeguard against empty or invalid matrix (e.g. from error results)
+        if (matrixData == null || matrixData.Length < 2 || matrixData[0].Length < 2)
+        {
+            chart.Plot.Clear();
+            chart.Plot.Add.Text("Hata Matrisi\nBulunamadı", 0.5, 0.5);
+            chart.Refresh();
+            return;
+        }
+
+        // matrixData: Row=Actual, Col=Predicted
+        // [0][0] = TN, [0][1] = FP
+        // [1][0] = FN, [1][1] = TP
+
+        double[,] visualMatrix = new double[2, 2];
+        visualMatrix[0, 0] = matrixData[1][0]; // y=0 (Sick), x=0 (Healthy) -> FN
+        visualMatrix[0, 1] = matrixData[1][1]; // y=0 (Sick), x=1 (Sick)    -> TP
+        visualMatrix[1, 0] = matrixData[0][0]; // y=1 (Healthy), x=0 (Healthy) -> TN
+        visualMatrix[1, 1] = matrixData[0][1]; // y=1 (Healthy), x=1 (Sick) -> FP
+
+        var hm = chart.Plot.Add.Heatmap(visualMatrix);
+        hm.Colormap = new ScottPlot.Colormaps.Blues();
+
+        var t1 = chart.Plot.Add.Text(visualMatrix[0, 0].ToString(), 0, 0); t1.LabelAlignment = ScottPlot.Alignment.MiddleCenter; t1.LabelFontSize = 18; t1.LabelBold = true;
+        var t2 = chart.Plot.Add.Text(visualMatrix[0, 1].ToString(), 1, 0); t2.LabelAlignment = ScottPlot.Alignment.MiddleCenter; t2.LabelFontSize = 18; t2.LabelBold = true;
+        var t3 = chart.Plot.Add.Text(visualMatrix[1, 0].ToString(), 0, 1); t3.LabelAlignment = ScottPlot.Alignment.MiddleCenter; t3.LabelFontSize = 18; t3.LabelBold = true;
+        var t4 = chart.Plot.Add.Text(visualMatrix[1, 1].ToString(), 1, 1); t4.LabelAlignment = ScottPlot.Alignment.MiddleCenter; t4.LabelFontSize = 18; t4.LabelBold = true;
+
+        ScottPlot.TickGenerators.NumericManual tickGenX = new();
+        tickGenX.AddMajor(0, "Tahmin: Sağlıklı");
+        tickGenX.AddMajor(1, "Tahmin: Riskli");
+        chart.Plot.Axes.Bottom.TickGenerator = tickGenX;
+
+        ScottPlot.TickGenerators.NumericManual tickGenY = new();
+        tickGenY.AddMajor(0, "Gerçek: Riskli");
+        tickGenY.AddMajor(1, "Gerçek: Sağlıklı");
+        chart.Plot.Axes.Left.TickGenerator = tickGenY;
+
+        chart.Plot.Title($"Hata Matrisi ({modelName})");
+
+        chart.Plot.Axes.Bottom.FrameLineStyle.Width = 0;
+        chart.Plot.Axes.Left.FrameLineStyle.Width = 0;
+        chart.Plot.Axes.Right.FrameLineStyle.Width = 0;
+        chart.Plot.Axes.Top.FrameLineStyle.Width = 0;
+
+        chart.Plot.Axes.SetLimits(-0.5, 1.5, -0.5, 1.5);
+
+        chart.UserInputProcessor.Disable();
+        chart.Refresh();
+    }
+
+    private void DrawROC(ScottPlot.Avalonia.AvaPlot chart, List<ModelResult> results)
+    {
+        chart.Plot.Clear();
+
+        var diag = chart.Plot.Add.Line(0, 0, 1, 1);
+        diag.LinePattern = ScottPlot.LinePattern.Dashed;
+        diag.Color = ScottPlot.Colors.Gray;
+        diag.LineWidth = 2;
+        diag.LegendText = "Rastgele";
+
+        var palette = new ScottPlot.Palettes.Category10();
+        int i = 0;
+
+        foreach (var model in results)
+        {
+            if (model.RocFpr.Length > 0)
+            {
+                var scatter = chart.Plot.Add.Scatter(model.RocFpr, model.RocTpr);
+                scatter.LineWidth = 2;
+                scatter.MarkerSize = 0; // Line only
+                scatter.Color = palette.GetColor(i++);
+                scatter.LegendText = $"{model.Name} (AUC: {model.AUC:F2})";
+            }
+        }
+
+        chart.Plot.Title("ROC Eğrisi - Model Karşılaştırması");
+        chart.Plot.XLabel("Yanlış Pozitif Oranı (FPR)");
+        chart.Plot.YLabel("Doğru Pozitif Oranı (TPR)");
+
+        chart.Plot.ShowLegend();
+        chart.Plot.Axes.SetLimits(0, 1, 0, 1);
+
+        chart.UserInputProcessor.Disable();
+        chart.Refresh();
+    }
+
+
 }

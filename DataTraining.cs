@@ -1,4 +1,6 @@
 using Microsoft.ML;
+using HeartDiseaseChecker.Models;
+
 
 public class DataTraining
 {

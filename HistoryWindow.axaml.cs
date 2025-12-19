@@ -3,6 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using HeartDiseaseChecker.Services;
+using HeartDiseaseChecker.Models;
+
 using Avalonia.Metadata;
 
 namespace HeartDiseaseChecker;
@@ -33,7 +36,7 @@ public partial class HistoryWindow : Window
 
             var textBlock = new TextBlock
             {
-                Text = $"{record.Date} | Risk: %{record.Probability * 100:F1} | {record.Gender} | Age: {record.Age} | BP: {record.BloodPressure} | Chol: {record.Cholesterol} | Fbs: {record.BloodSugar} | CP: {record.ChestPainType} | Exang: {record.ExerciseInducedAngina}",
+                Text = $"{record.Date} | Risk: %{record.Probability * 100:F1} | {record.Gender} | Yaş: {record.Age} | KB: {record.BloodPressure} | Kol: {record.Cholesterol} | AçlıkŞ: {record.BloodSugar} | GAT: {record.ChestPainType} | E.A: {record.ExerciseInducedAngina}",
                 FontSize = 14,
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
             };
@@ -43,11 +46,11 @@ public partial class HistoryWindow : Window
             HistoryPanel.Children.Add(border);
         }
 
-        if(records.Count == 0)
+        if (records.Count == 0)
         {
             HistoryPanel.Children.Add(new TextBlock
             {
-                Text = "No records found.",
+                Text = "Kayıt bulunamadı.",
             });
         }
     }

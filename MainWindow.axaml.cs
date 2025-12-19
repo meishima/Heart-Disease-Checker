@@ -2,8 +2,12 @@ using System.Security.Cryptography.X509Certificates;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using HeartDiseaseChecker.Services;
+using HeartDiseaseChecker.Models;
+
 using Microsoft.ML;
 using System;
+using System.Linq;
 
 namespace HeartDiseaseChecker;
 
@@ -21,42 +25,50 @@ public partial class MainWindow : Window
     {
         SaveText.Children.Clear();
 
-        if(AgeInput.Value == null)
+        if (AgeInput.Value == null)
         {
-            TextResult.Text = "Please enter a valid age.";
+            TextResult.Text = "Lütfen geçerli bir yaş giriniz.";
             TextResult.Foreground = Brushes.OrangeRed;
             return;
         }
 
-        if(!float.TryParse(BloodPressureInput.Text, out float bpValue) ||
+        if (!float.TryParse(BloodPressureInput.Text, out float bpValue) ||
            !float.TryParse(CholesterolInput.Text, out float cholValue))
         {
-            TextResult.Text = "Please enter valid numeric values for Blood Pressure and Cholesterol.";
+            TextResult.Text = "Lütfen Kan Basıncı ve Kolesterol için geçerli sayısal değerler giriniz.";
             TextResult.Foreground = Brushes.OrangeRed;
             return;
         }
 
         int genderVal = MaleInput.IsChecked == true ? 0 : FemaleInput.IsChecked == true ? 1 : -1;
         int fbsVal = FbsYesInput.IsChecked == true ? 0 : FbsNoInput.IsChecked == true ? 1 : -1;
-        int cpVal = Cp0Input.IsChecked == true ? 0 : 
+        int cpVal = Cp0Input.IsChecked == true ? 0 :
                     Cp1Input.IsChecked == true ? 1 :
-                    Cp2Input.IsChecked == true ? 2 : 
+                    Cp2Input.IsChecked == true ? 2 :
                     Cp3Input.IsChecked == true ? 3 : -1;
         int exangVal = ExangYesInput.IsChecked == true ? 0 : ExangNoInput.IsChecked == true ? 1 : -1;
 
-        if(genderVal == -1 || fbsVal == -1 || cpVal == -1 || exangVal == -1)
+        if (genderVal == -1 || fbsVal == -1 || cpVal == -1 || exangVal == -1)
         {
-            TextResult.Text = "Please make sure to select all options.";
+            TextResult.Text = "Lütfen tüm seçenekleri belirlediğinizden emin olun.";
             TextResult.Foreground = Brushes.OrangeRed;
             return;
         }
-        SaveBtn.IsEnabled = true;
-
-        MLContext mLContext = new MLContext();
-        DataViewSchema modelSchema;
-        ITransformer trainedModel = mLContext.Model.Load("heartmodel.zip", out modelSchema);
-
-        var predEngine = mLContext.Model.CreatePredictionEngine<HeartData, HeartPrediction>(trainedModel);
+        if (ModelService.TrainedModels.Count == 0 && string.IsNullOrEmpty("heartmodel.zip")) // Simplified check
+        {
+            // If no models trained in session, fallback to loading file if exists, or warn.
+            // For Phase 5, we prefer session models.
+            if (ModelService.TrainedModels.Count == 0)
+            {
+                // Try loading default just for legacy support or warn
+                if (!System.IO.File.Exists("heartmodel.zip"))
+                {
+                    TextResult.Text = "Lütfen önce 'Veriseti Hesaplamaları' menüsünden modelleri sçip 'Modelleri Eğit' butonuna basınız.";
+                    TextResult.Foreground = Brushes.OrangeRed;
+                    return;
+                }
+            }
+        }
 
         var input = new HeartData()
         {
@@ -69,49 +81,98 @@ public partial class MainWindow : Window
             ExerciseInducedAngina = exangVal,
         };
 
-        var result = predEngine.Predict(input);
+        // Multi-model prediction
+        var results = ModelService.Predict(input);
+
+        // If we have multi-model results (session trained)
+        if (results.Count > 0)
+        {
+            ConsensusPanel.IsVisible = true;
+            ModelResultsList.ItemsSource = null; // Reset
+
+            int riskVotes = results.Count(x => x.Prediction);
+            int totalVotes = results.Count;
+            double confidence = (double)riskVotes / totalVotes * 100;
+
+            var items = new System.Collections.Generic.List<string>();
+            foreach (var r in results)
+            {
+                string status = r.Prediction ? "RİSKLİ" : "SAĞLIKLI";
+                items.Add($"{r.ModelName}: {status} (%{r.Probability * 100:F1})");
+            }
+            ModelResultsList.ItemsSource = items;
+
+            if (riskVotes > totalVotes / 2)
+            {
+                TextResult.Text = $"YÜKSEK RİSK! ({totalVotes} modelden {riskVotes}'ü onayladı)";
+                TextResult.Foreground = Brushes.Red;
+                ConsensusText.Text = $"Güven Skoru: %{confidence:F1}";
+                RiskBar.Value = confidence;
+                _tempPrediction = new HeartPrediction { Prediction = true, Probability = (float)confidence / 100f };
+            }
+            else
+            {
+                TextResult.Text = $"Düşük Risk. ({totalVotes} modelden {totalVotes - riskVotes}'si temiz dedi)";
+                TextResult.Foreground = Brushes.Green;
+                ConsensusText.Text = $"Güven Skoru: %{100 - confidence:F1}";
+                RiskBar.Value = confidence;
+                _tempPrediction = new HeartPrediction { Prediction = false, Probability = (float)confidence / 100f };
+            }
+        }
+        else // Legacy single model fallback
+        {
+            ConsensusPanel.IsVisible = false;
+            MLContext mLContext = new MLContext();
+            DataViewSchema modelSchema;
+            ITransformer trainedModel = mLContext.Model.Load("heartmodel.zip", out modelSchema);
+            var predEngine = mLContext.Model.CreatePredictionEngine<HeartData, HeartPrediction>(trainedModel);
+            var result = predEngine.Predict(input);
+
+            // ... (keep legacy display logic or refactor? Let's keep it simple for now as reliable fallback)
+            _tempData = input;
+            _tempPrediction = result;
+
+            if (result.Prediction)
+            {
+                TextResult.Text = $"Kalp hastalığı riski YÜKSEK! (Olasılık: %{result.Probability * 100:F1})";
+                TextResult.Foreground = Brushes.Red;
+            }
+            else
+            {
+                TextResult.Text = $"Kalp hastalığı riski Düşük! (Olasılık: %{result.Probability * 100:F1})";
+                TextResult.Foreground = Brushes.Green;
+            }
+            RiskBar.Value = result.Probability * 100;
+        }
 
         _tempData = input;
-        _tempPrediction = result;
-
-        if(result.Prediction)
-        {
-            TextResult.Text = $"High risk of heart disease with a probability of {result.Probability * 100:F1}";
-            TextResult.Foreground = Brushes.Red;
-        }
-        else
-        {
-            TextResult.Text = $"Low risk of heart disease! (Probability: {result.Probability * 100:F1}%)";
-            TextResult.Foreground = Brushes.Green;
-        }
 
         AdvicePanel.Children.Clear();
-        if(bpValue >= 180)
+        if (bpValue >= 180)
         {
-            AddText("You are in Hypertensive Crisis! Seek emergency help immediately!", Brushes.DarkRed, AdvicePanel);
-        } 
-        else if(bpValue >= 140)
+            AddText("Hipertansif Krizdesiniz! Acilen yardım alın!", Brushes.DarkRed, AdvicePanel);
+        }
+        else if (bpValue >= 140)
         {
-            AddText("You are in High Blood Pressure Stage 2! Consult a doctor immediately.", Brushes.Red, AdvicePanel);
-        } 
-        else if(bpValue >= 130)
+            AddText("2. Evre Yüksek Tansiyon! Derhal bir doktora danışın.", Brushes.Red, AdvicePanel);
+        }
+        else if (bpValue >= 130)
         {
-            AddText("You are in High Blood Pressure Stage 1!", Brushes.OrangeRed, AdvicePanel);
-        } 
-        else if(bpValue >= 120)
+            AddText("1. Evre Yüksek Tansiyon!", Brushes.OrangeRed, AdvicePanel);
+        }
+        else if (bpValue >= 120)
         {
-            AddText("Your blood pressure is elevated.", Brushes.Yellow, AdvicePanel);
-        }   
+            AddText("Tansiyonunuz yüksek.", Brushes.Yellow, AdvicePanel);
+        }
 
-        if(cholValue >= 240)
+        if (cholValue >= 240)
         {
-            AddText("Your cholesterol level is high! Consult a doctor immediately.", Brushes.Red, AdvicePanel);
+            AddText("Kolesterol seviyeniz yüksek! Derhal bir doktora danışın.", Brushes.Red, AdvicePanel);
         }
-        else if(cholValue >= 200)
+        else if (cholValue >= 200)
         {
-            AddText("Your cholesterol level is borderline-high! Consult a doctor.", Brushes.OrangeRed, AdvicePanel);
+            AddText("Kolesterol seviyeniz sınırda yüksek! Bir doktora danışın.", Brushes.OrangeRed, AdvicePanel);
         }
-        RiskBar.Value = result.Probability * 100;
     }
     private void AddText(string message, IBrush color, StackPanel panel)
     {
@@ -122,7 +183,7 @@ public partial class MainWindow : Window
             TextWrapping = Avalonia.Media.TextWrapping.Wrap,
         };
 
-        panel.Children.Add(textBlock);    
+        panel.Children.Add(textBlock);
     }
 
     private void BtnReset_Click(object sender, RoutedEventArgs e)
@@ -140,7 +201,7 @@ public partial class MainWindow : Window
         Cp3Input.IsChecked = false;
         ExangYesInput.IsChecked = false;
         ExangNoInput.IsChecked = false;
-        TextResult.Text = "Click \"Analyze Risk\" after filling all fields to see the analysis";
+        TextResult.Text = "Analizi görmek için tüm alanları doldurup \"Risk Analizi\"ne tıklayın";
         TextResult.Foreground = Brushes.White;
         RiskBar.Value = 0;
         AdvicePanel.Children.Clear();
@@ -152,33 +213,33 @@ public partial class MainWindow : Window
 
     private void SaveBtn_Click(object sender, RoutedEventArgs e)
     {
-        if(_tempData == null || _tempPrediction == null)
+        if (_tempData == null || _tempPrediction == null)
         {
             return;
         }
         DatabaseManager.InsertRecord(
             DateTime.Now,
             _tempData.Age,
-            _tempData.Gender == 0 ? "Male" : "Female",
+            _tempData.Gender == 0 ? "Erkek" : "Kadın",
             _tempData.BloodPressure,
             _tempData.Cholesterol,
-            _tempData.BloodSugar == 0 ? "Yes" : "No",
+            _tempData.BloodSugar == 0 ? "Evet" : "Hayır",
             _tempData.ChestPainType switch
             {
-                0 => "Typical Angina",
-                1 => "Atypical Angina",
-                2 => "Non-Anginal Pain",
-                3 => "Asymptomatic",
-                _ => "Unknown"
+                0 => "Tipik Anjina",
+                1 => "Atipik Anjina",
+                2 => "Anjinal Olmayan Ağrı",
+                3 => "Asemptomatik",
+                _ => "Bilinmiyor"
             },
-            _tempData.ExerciseInducedAngina == 0 ? "Yes" : "No",
+            _tempData.ExerciseInducedAngina == 0 ? "Evet" : "Hayır",
             _tempPrediction!.Probability
         );
 
         SaveText.Children.Add(
             new TextBlock
             {
-                Text = "Result has saved to the database.",
+                Text = "Sonuç veritabanına kaydedildi.",
                 Foreground = Brushes.LightGreen,
                 TextWrapping = Avalonia.Media.TextWrapping.Wrap
             }
@@ -202,7 +263,7 @@ public partial class MainWindow : Window
     {
         if (AgeInput.Value == null || MaxHRInput.Value == null)
         {
-            TextResult.Text = "Please enter Age and Max Heart Rate to visualize risk.";
+            TextResult.Text = "Riski görselleştirmek için lütfen Yaş ve Maksimum Kalp Atış Hızını girin.";
             TextResult.Foreground = Brushes.OrangeRed;
             return;
         }
@@ -215,7 +276,7 @@ public partial class MainWindow : Window
 
         if (genderVal == -1 || cpVal == -1)
         {
-            TextResult.Text = "Please select Gender and Chest Pain Type.";
+            TextResult.Text = "Lütfen Cinsiyet ve Göğüs Ağrısı Tipini seçin.";
             TextResult.Foreground = Brushes.OrangeRed;
             return;
         }

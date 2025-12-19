@@ -8,74 +8,87 @@
         Width="650" Height="850">
     <ScrollViewer>
         <StackPanel Margin="20" Spacing="10">
-            <TextBlock Text="Heart Disease Risk Checker" FontSize="20" HorizontalAlignment="Center"/>
+            <TextBlock Text="Kalp Hastalığı Risk Kontrolü" FontSize="20" HorizontalAlignment="Center"/>
             
             <StackPanel>
-                <TextBlock Text="Your Age:"/>
+                <TextBlock Text="Yaşınız:"/>
                 <NumericUpDown Name="AgeInput" Minimum="18" Maximum="100" Watermark="18+"/>
             </StackPanel>
     
             <StackPanel>
-                <TextBlock Text="Gender:"/>
-                <RadioButton Name="MaleInput" Content="Male"/>
-                <RadioButton Name="FemaleInput" Content="Female"/>
+                <TextBlock Text="Cinsiyet:"/>
+                <RadioButton Name="MaleInput" Content="Erkek"/>
+                <RadioButton Name="FemaleInput" Content="Kadın"/>
             </StackPanel>
     
     
             <StackPanel>
-                <TextBlock Text="Blood Pressure:"/>
+                <TextBlock Text="Kan Basıncı:"/>
                 <TextBox Name="BloodPressureInput" Watermark="mm/Hg"/>
             </StackPanel>
     
             <StackPanel>
-                <TextBlock Text="Cholesterol:"/>
+                <TextBlock Text="Kolesterol:"/>
                 <TextBox Name="CholesterolInput" Watermark="mg/dl"/>
             </StackPanel>
     
             <StackPanel>
-                <TextBlock Text="Is your Fasting Blood Sugar above 120 mg/dl?"/>
-                <RadioButton Name="FbsYesInput" Content="Yes"/>
-                <RadioButton Name="FbsNoInput" Content="No"/>
+                <TextBlock Text="Açlık Kan Şekeriniz 120 mg/dl üzerinde mi?"/>
+                <RadioButton Name="FbsYesInput" Content="Evet"/>
+                <RadioButton Name="FbsNoInput" Content="Hayır"/>
             </StackPanel>
     
     
             <StackPanel>
-                <TextBlock Text="Chest Pain Type:"/>
-                <RadioButton Name="Cp0Input" Content="Typical Angina (0)"/>
-                <RadioButton Name="Cp1Input" Content="Atypical Angina (1)"/>
-                <RadioButton Name="Cp2Input" Content="Non-Anginal Pain (2)"/>
-                <RadioButton Name="Cp3Input" Content="Asymptomatic (3)"/>    
+                <TextBlock Text="Göğüs Ağrısı Tipi:"/>
+                <RadioButton Name="Cp0Input" Content="Tipik Anjina (0)"/>
+                <RadioButton Name="Cp1Input" Content="Atipik Anjina (1)"/>
+                <RadioButton Name="Cp2Input" Content="Anjinal Olmayan Ağrı (2)"/>
+                <RadioButton Name="Cp3Input" Content="Asemptomatik (3)"/>    
             </StackPanel>
     
             <StackPanel>
-                <TextBlock Text="Do you experience chest pain during exercising?"/>
-                <RadioButton Name="ExangYesInput" Content="Yes"/>
-                <RadioButton Name="ExangNoInput" Content="No"/>
+                <TextBlock Text="Egzersiz sırasında göğüs ağrısı yaşıyor musunuz?"/>
+                <RadioButton Name="ExangYesInput" Content="Evet"/>
+                <RadioButton Name="ExangNoInput" Content="Hayır"/>
             </StackPanel>
     
             <StackPanel>
-                <TextBlock Text="Max Heart Rate:"/>
-                <NumericUpDown Name="MaxHRInput" Minimum="50" Maximum="220" Watermark="e.g. 150"/>
+                <TextBlock Text="Maksimum Kalp Atış Hızı:"/>
+                <NumericUpDown Name="MaxHRInput" Minimum="50" Maximum="220" Watermark="örn. 150"/>
             </StackPanel>
     
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
-                <Button Name="BtnCalculate" Content="Analyze Risk" Click="BtnCalculate_Click"/>
-                <Button Name="BtnVisualize" Content="Visualize My Risk" Click="BtnVisualize_Click"/>
-                <Button Name="SaveBtn" Content="Save Result" Click="SaveBtn_Click"/>
-                <Button Name="BtnHistory" Content="View History" Click="BtnHistory_Click"/>
-                <Button Name="BtnReset" Content="Reset" Click="BtnReset_Click"/>
-                <Button Name="BtnDataset" Content="Dataset Calculations" Click="BtnDataset_Click"/>
+                <Button Name="BtnCalculate" Content="Risk Analizi" Click="BtnCalculate_Click"/>
+                <Button Name="BtnVisualize" Content="Riskimi Görselleştir" Click="BtnVisualize_Click"/>
+                <Button Name="SaveBtn" Content="Sonucu Kaydet" Click="SaveBtn_Click"/>
+                <Button Name="BtnHistory" Content="Geçmişi Görüntüle" Click="BtnHistory_Click"/>
+                <Button Name="BtnReset" Content="Sıfırla" Click="BtnReset_Click"/>
+                <Button Name="BtnDataset" Content="Veriseti Hesaplamaları" Click="BtnDataset_Click"/>
             </StackPanel>
     
             <StackPanel Name="SaveText"/>
     
-            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,10,0,0">
+                <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,10,0,0">
                 <StackPanel>
-                    <TextBlock Text="Results:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBlock Text="Sonuçlar:" FontWeight="Bold" Margin="0,0,0,5"/>
                     <TextBlock Name="TextResult" 
-                               Text='Click "Analyze Risk" after filling all fields to see the analysis.' 
+                               Text='Analizi görmek için tüm alanları doldurup "Risk Analizi"ne tıklayın.' 
                                TextWrapping="Wrap"/>
                     <ProgressBar Name="RiskBar" Minimum="0" Maximum="100" Height="20" ShowProgressText="True" Margin="0,10,0,0"/>
+
+                    <StackPanel Name="ConsensusPanel" IsVisible="False" Margin="0,10,0,0">
+                        <TextBlock Text="Çoklu Model Konsensüsü:" FontWeight="Bold"/>
+                        <TextBlock Name="ConsensusText" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                        <ItemsControl Name="ModelResultsList" Margin="0,5,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" Margin="5,0"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
                     <StackPanel Name="AdvicePanel" Spacing="5" Margin="5"/>
                 </StackPanel>
             </Border>
